@@ -7,8 +7,8 @@ from time import sleep
 link = "https://kissanime.ru/Anime/"
 
 def submit_idpass(BROWSER):
-    with open('idpass.txt', 'r') as f:
-        kissmanga_credentials = f.read().splitlines()
+	with open('idpass.txt', 'r') as f:
+	kissmanga_credentials = f.read().splitlines()
     username_area = BROWSER.find_element_by_id('username')
     username_area.send_keys(kissmanga_credentials[0])
     password_area = BROWSER.find_element_by_id('password')
