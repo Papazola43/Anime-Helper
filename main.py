@@ -8,17 +8,17 @@ link = "https://kissanime.ru/Anime/"
 
 def submit_idpass(BROWSER):
 	with open('idpass.txt', 'r') as f:
-	kissmanga_credentials = f.read().splitlines()
-    username_area = BROWSER.find_element_by_id('username')
-    username_area.send_keys(kissmanga_credentials[0])
-    password_area = BROWSER.find_element_by_id('password')
-    password_area.send_keys(kissmanga_credentials[1])
-    submit_button = BROWSER.find_element_by_id('btnSubmit')
-    submit_button.click()
-    BROWSER.switch_to.window(BROWSER.window_handles[1])
-    BROWSER.close()
-    BROWSER.switch_to.window(BROWSER.window_handles[0])
-    return
+		kissmanga_credentials = f.read().splitlines()
+	username_area = BROWSER.find_element_by_id('username')
+	username_area.send_keys(kissmanga_credentials[0])
+	password_area = BROWSER.find_element_by_id('password')
+	password_area.send_keys(kissmanga_credentials[1])
+	submit_button = BROWSER.find_element_by_id('btnSubmit')
+	submit_button.click()
+	BROWSER.switch_to.window(BROWSER.window_handles[1])
+	BROWSER.close()
+	BROWSER.switch_to.window(BROWSER.window_handles[0])
+	return
 
 def showMenu():
 	print("1. Start watching")
