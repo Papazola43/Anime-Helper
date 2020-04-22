@@ -20,9 +20,6 @@ def submit_idpass(BROWSER):
     BROWSER.switch_to.window(BROWSER.window_handles[0])
     return
 
-def cancel():
-	return main()
-
 def showMenu():
 	print("1. Start watching")
 	print("2. Show list")
@@ -86,6 +83,13 @@ def showList2():
 def deleteList():
 	showList()
 	with open("Anime List.txt","r+") as f:
+		if f is None:
+			system('cls')
+			print("the list is empty! returning to main page...")
+			sleep(2)
+			system('cls')
+			return
+
 		lists = f.read().splitlines()
 		while True:
 			try:
@@ -160,7 +164,7 @@ def processAnswer1(argument):
 		4: deleteList,
 		5: exit,
 	}
-	temp = switcher.get(argument, cancel)
+	temp = switcher.get(argument)
 	return temp()
 
 
