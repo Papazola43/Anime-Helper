@@ -1,8 +1,8 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.keys import Keys
 from os import system
 from time import sleep
-from selenium.webdriver.common.keys import Keys
 from bs4 import BeautifulSoup
 import re
 
@@ -16,13 +16,16 @@ EPISODE_END = re.escape(EPISODE_END).split('\\\n')
 EPISODE_END = '\s*\\\n\s*'.join(EPISODE_END)
 
 def closeAd(BROWSER):
+	flag = False
 	if len(BROWSER.window_handles) > 1:
 		BROWSER.switch_to.window(BROWSER.window_handles[1])
 		BROWSER.close()
-	BROWSER.switch_to.window(BROWSER.window_handles[0])
+		BROWSER.switch_to.window(BROWSER.window_handles[0])
+		flag = True
+	sleep(0.1)
 	if BROWSER.current_url.find('kissanime') == -1:
 		BROWSER.execute_script("window.history.go(-1)")
-	return	
+	return flag	
 
 def submit_idpass(BROWSER):
 	with open('idpass.txt', 'r') as f:
@@ -45,7 +48,8 @@ def afterCaptcha(BROWSER):
 		if 'AreYouHuman2' in BROWSER.current_url:
 			sleep(2)
 		elif i == 30:
-			exit()
+			BROWSER.get(BROWSER.current_url)
+			afterCaptcha(BROWSER)
 		elif 'kissanime' in BROWSER.current_url:
 			sleep(4)
 			break
@@ -53,25 +57,26 @@ def afterCaptcha(BROWSER):
 			continue
 
 	closeAd(BROWSER)
-
+	if 'AreYouHuman2' in BROWSER.current_url:
+		afterCaptcha(BROWSER)
 	close_ad = BROWSER.find_element_by_class_name('glx-close.glx-close-with-text')
 	close_ad.click()
-	sleep(1)
+	sleep(0.5)
 	play_button = BROWSER.find_element_by_class_name('vjs-big-play-button')
 	play_button.click()
 
 	closeAd(BROWSER)
-	sleep(1)
+	sleep(0.5)
 	fullscreen_button = BROWSER.find_element_by_class_name('vjs-fullscreen-control.vjs-control')
 	fullscreen_button.click()
-	if len(BROWSER.window_handles) > 1:
-		BROWSER.switch_to.window(BROWSER.window_handles[1])
-		BROWSER.close()
-		BROWSER.switch_to.window(BROWSER.window_handles[0])
+	if closeAd(BROWSER) is True:
 		fullscreen_button.click()
 
 	while True:
-		sleep(5)
+		if closeAd(BROWSER) is True:
+			fullscreen_button.click()
+		if 'AreYouHuman2' in BROWSER.current_url:
+			afterCaptcha(BROWSER)
 		raw_data = BROWSER.page_source
 		soup = BeautifulSoup(raw_data,'html.parser')
 		progress = soup.find('div',{'role':"slider"})['aria-valuenow']
@@ -80,11 +85,19 @@ def afterCaptcha(BROWSER):
 	try:
 		next_button = BROWSER.find_element_by_id('btnNext')
 	except NoSuchElementException:
-		keyboard.press(Key.escape)
-		keyboard.release(Key.escape)
+		fullscreen_button.click()
+		closeAd(BROWSER)
+		next_button = BROWSER.find_element_by_id('btnNext')
 		return
-	next_button.click()	
+	is_fullscreen = soup.find('div',{'id':"my_video_1"})['class']
+	#print (type(is_fullscreen),is_fullscreen)
+	if 'vjs-fullscreen' in is_fullscreen:
+		fullscreen_button.click()
+	closeAd(BROWSER)
+	next_button.click()
+	closeAd(BROWSER)	
 	afterCaptcha(BROWSER)
+	return
 
 def showMenu():
 	print("1. Start watching")
@@ -238,7 +251,7 @@ def addList():
 	return
 
 
-def processAnswer1(argument):
+def processAnswer(argument):
 	switcher = {
 		1: startWatching,
 		2: showList2,
@@ -269,8 +282,8 @@ def main():
 			else:
 				break;
 		system('cls')			
-		processAnswer1(input1)
+		processAnswer(input1)
 
-
-if __name__ == "__main__":
-	main()
+main()
+'''if __name__ == "__main__":
+	main()'''
